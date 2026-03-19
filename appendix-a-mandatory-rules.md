@@ -76,7 +76,7 @@ Rules:
 - Any change that affects system behaviour must be reflected in docs/ synchronously with the code
 - Do not modify requirements documents without explicit human approval
 - Each docs/ file has a single owner by role (see ownership table in standard section 5.1). NEVER edit files owned by another role — create a Jira issue for the file owner instead
-- Sync all docs changes to Confluence via atlassian MCP after every update
+- Sync all docs changes to Confluence via atlassian MCP immediately after every update. This is mandatory — git and Confluence must always be in sync. If sync fails, report it and retry before proceeding
 
 ### CLAUDE.md Maintenance
 

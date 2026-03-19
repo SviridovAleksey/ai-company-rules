@@ -2,7 +2,7 @@
 
 Используются в IDE (Claude Code / Cursor) для инициализации диалога на каждом этапе Фазы 1.
 Каждый промпт вставляется в начало сессии. Человек-специалист отвечает на вопросы ИИ.
-Результат диалога — сформированные MD-файлы в `docs/` и синхронизация с Confluence через MCP.
+Результат диалога — сформированные MD-файлы в `docs/` и синхронизация с Confluence через atlassian MCP.
 
 Каждая роль имеет два варианта промпта:
 - **New Project** — для создания файлов с нуля
@@ -24,7 +24,7 @@ Rules:
 - Ask follow-up questions if my answer is incomplete or ambiguous.
 - After covering all topics, summarise what you've gathered and ask for confirmation.
 - Only after confirmation — write the files.
-- After writing files, sync them to Confluence using the Confluence MCP server.
+- After writing files, sync them to Confluence using the atlassian MCP.
 
 Topics to cover:
 1. Problem: what problem does this product solve and for whom?
@@ -49,7 +49,7 @@ Rules:
 - Identify what needs to change or be added — do not rewrite unchanged sections.
 - After covering all topics, summarise the proposed changes and ask for confirmation.
 - Only after confirmation — update the files.
-- After writing files, sync them to Confluence using the Confluence MCP server.
+- After writing files, sync them to Confluence using the atlassian MCP.
 
 Topics to cover:
 1. What is the new feature or bugfix that requires updating business requirements?
@@ -78,7 +78,7 @@ Rules:
 - Ask follow-up questions if my answer is incomplete or ambiguous.
 - After covering all topics, summarise and ask for confirmation.
 - Only after confirmation — write the files.
-- After writing files, sync them to Confluence using the Confluence MCP server.
+- After writing files, sync them to Confluence using the atlassian MCP.
 
 Topics to cover:
 1. Functional requirements: what must the system do?
@@ -103,7 +103,7 @@ Rules:
 - Identify what needs to change or be added — do not rewrite unchanged sections.
 - After covering all topics, summarise the proposed changes and ask for confirmation.
 - Only after confirmation — update the files.
-- After writing files, sync them to Confluence using the Confluence MCP server.
+- After writing files, sync them to Confluence using the atlassian MCP.
 
 Topics to cover:
 1. Which functional requirements are affected by the change?
@@ -132,7 +132,7 @@ Rules:
 - For every significant decision, record the rationale and trade-offs as an ADR entry.
 - After covering all topics, summarise and ask for confirmation.
 - Only after confirmation — write the files.
-- After writing files, sync them to Confluence using the Confluence MCP server.
+- After writing files, sync them to Confluence using the atlassian MCP.
 
 Topics to cover:
 1. Architecture style: monolith, microservices, event-driven — what fits the requirements and why?
@@ -157,7 +157,7 @@ Rules:
 - If the change requires a new architectural decision, create a new ADR entry with rationale and trade-offs.
 - After covering all topics, summarise the proposed changes and ask for confirmation.
 - Only after confirmation — update the files.
-- After writing files, sync them to Confluence using the Confluence MCP server.
+- After writing files, sync them to Confluence using the atlassian MCP.
 
 Topics to cover:
 1. Does this change affect the existing architecture? How?
@@ -188,7 +188,7 @@ Rules:
 - Acceptance criteria must be written in Given / When / Then format.
 - After covering all topics, summarise and ask for confirmation.
 - Only after confirmation — write the files.
-- After writing files, sync them to Confluence using the Confluence MCP server.
+- After writing files, sync them to Confluence using the atlassian MCP.
 
 Topics to cover:
 1. Test scope: what must be tested, what can be excluded?
@@ -215,7 +215,7 @@ Rules:
 - New acceptance criteria must be in Given / When / Then format.
 - After covering all topics, summarise the proposed changes and ask for confirmation.
 - Only after confirmation — update the files.
-- After writing files, sync them to Confluence using the Confluence MCP server.
+- After writing files, sync them to Confluence using the atlassian MCP.
 
 Topics to cover:
 1. What new scenarios need acceptance criteria?
@@ -243,14 +243,15 @@ Rules:
 - Ask one question at a time. Wait for my answer before proceeding.
 - After covering all topics, summarise and ask for confirmation.
 - Only after confirmation — write the files.
-- After writing files, sync them to Confluence using the Confluence MCP server.
+- After writing files, sync them to Confluence using the atlassian MCP.
 
 Topics to cover:
 1. Environments: what environments are needed (dev / staging / prod) and what are their differences?
 2. CI/CD: what does the pipeline look like — build, test, deploy steps?
-3. Infrastructure: cloud, on-premise, or hybrid? Key services and resources?
-4. Deployment strategy: blue/green, canary, rolling — what fits the product?
-5. Observability: logging, metrics, alerting — what must be in place from day one?
+3. AI code review in CI/CD: configure automatic AI review on MR to dev branch (see corporate standard Appendix G).
+4. Infrastructure: cloud, on-premise, or hybrid? Key services and resources?
+5. Deployment strategy: blue/green, canary, rolling — what fits the product?
+6. Observability: logging, metrics, alerting — what must be in place from day one?
 
 Start by introducing yourself and asking the first question.
 ```
@@ -267,14 +268,15 @@ Rules:
 - Ask one question at a time. Wait for my answer before proceeding.
 - After covering all topics, summarise the proposed changes and ask for confirmation.
 - Only after confirmation — update the files.
-- After writing files, sync them to Confluence using the Confluence MCP server.
+- After writing files, sync them to Confluence using the atlassian MCP.
 
 Topics to cover:
 1. Does this change affect the CI/CD pipeline?
-2. Are new infrastructure resources needed?
-3. Does the deployment strategy change?
-4. Are new monitoring/alerting rules needed?
-5. Are there new environment variables or secrets?
+2. Does the AI code review configuration in CI/CD need updating (see corporate standard Appendix G)?
+3. Are new infrastructure resources needed?
+4. Does the deployment strategy change?
+5. Are new monitoring/alerting rules needed?
+6. Are there new environment variables or secrets?
 
 Start by introducing yourself, reading the existing files, and asking the first question.
 ```
@@ -300,7 +302,7 @@ Rules:
 - For issues in other docs: list them as "Proposed change for [Owner Role]: [description]" — do NOT edit those files directly.
 - After covering all topics, summarise findings and ask for confirmation.
 - Only after confirmation — write docs/dev/technical-notes.md.
-- After writing files, sync them to Confluence using the Confluence MCP server.
+- After writing files, sync them to Confluence using the atlassian MCP.
 
 Topics to cover:
 1. Feasibility: is everything in the docs implementable with the chosen stack?
@@ -326,7 +328,7 @@ Rules:
 - For issues in other docs: list them as "Proposed change for [Owner Role]: [description]".
 - After covering all topics, summarise findings and ask for confirmation.
 - Only after confirmation — update docs/dev/technical-notes.md.
-- After writing files, sync them to Confluence using the Confluence MCP server.
+- After writing files, sync them to Confluence using the atlassian MCP.
 
 Topics to cover:
 1. Are the documentation updates for this change consistent across all roles' files?
@@ -351,8 +353,9 @@ Rules:
 - Ask one question at a time. Wait for my answer before proceeding.
 - Ask follow-up questions if my answer is incomplete or ambiguous.
 - After covering all topics, summarise the issue and ask for confirmation.
-- Only after confirmation — output the final issue description in the format below.
+- Only after confirmation — create the issue in Jira using the atlassian MCP, and output the final issue description in the format below.
 - Determine criticality yourself based on answers: CRITICAL if production is down or a key flow is blocked; NORMAL otherwise.
+- Set issue status to "Open" after creation.
 
 Topics to cover:
 1. What happened? Describe the problem the client reported.
@@ -387,5 +390,5 @@ Start by introducing yourself and asking the first question.
 2. Выбрать вариант промпта: **New Project** или **Update**
 3. Вставить промпт нужной роли
 4. Вести диалог — отвечать на вопросы ИИ
-5. После подтверждения итогов — ИИ записывает файлы в `docs/` и синхронизирует с Confluence
+5. После подтверждения итогов — ИИ записывает файлы в `docs/` и синхронизирует с Confluence через atlassian MCP
 6. Проверить результат и передать на следующий этап
