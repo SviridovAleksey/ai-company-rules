@@ -1,9 +1,11 @@
-# Приложение A — Обязательный блок правил для CLAUDE.md проекта
+# Приложение A — Обязательный блок правил для AI_RULES.md проекта
 
-Следующий блок **обязателен к вставке** в `CLAUDE.md` каждого проекта без изменений.
+Следующий блок **обязателен к вставке** в `AI_RULES.md` каждого проекта без изменений.
 Дополнительные правила, специфичные для проекта, добавляются после этого блока.
 
-**Важно:** CLAUDE.md должен содержать не более 200 строк. Детали выносить через `@imports` и `.claude/rules/`.
+**Важно:** `AI_RULES.md` должен содержать не более 200 строк. Детали выносить через `@imports` и `.ai/rules/`.
+
+> **Маппинг на инструменты:** при инициализации проекта `import.sh` транслирует `AI_RULES.md` в формат конкретного инструмента (`CLAUDE.md`, `.cursorrules` и др.).
 
 ---
 
@@ -43,12 +45,12 @@ Rules:
 
 - Run /clear between unrelated tasks
 - After 2 failed corrections — /clear and start fresh with a better prompt
-- Use serena MCP for code navigation (go to definition, find references) instead of reading entire files
+- Use MCP servers for code navigation (go to definition, find references) instead of reading entire files
 - Use subagents for broad codebase investigation to preserve main context
-- Use context7 MCP for library docs instead of pasting documentation
+- Use MCP servers for library docs instead of pasting documentation
 - Use MCP memory server to persist context between sessions
-- Use git MCP for diffs and logs instead of raw bash output
-- Use atlassian MCP for Jira/Confluence operations instead of manual copy-paste from browser
+- Use MCP servers for git operations (diffs, logs) instead of raw bash output
+- Use MCP servers for task tracker and knowledge base operations instead of manual copy-paste
 
 ### Code Quality
 
@@ -75,20 +77,20 @@ Rules:
 - All significant architectural decisions must be recorded as ADR in docs/architecture/adr/
 - Any change that affects system behaviour must be reflected in docs/ synchronously with the code
 - Do not modify requirements documents without explicit human approval
-- Each docs/ file has a single owner by role (see ownership table in standard section 5.1). NEVER edit files owned by another role — create a Jira issue for the file owner instead
-- Sync all docs changes to Confluence via atlassian MCP immediately after every update. This is mandatory — git and Confluence must always be in sync. If sync fails, report it and retry before proceeding
+- Each docs/ file has a single owner by role (see ownership table in standard section 5.1). NEVER edit files owned by another role — create an issue for the file owner in the task tracker instead
+- Sync all docs changes to the corporate knowledge base via MCP immediately after every update. This is mandatory — git and knowledge base must always be in sync. If sync fails, report it and retry before proceeding
 
-### CLAUDE.md Maintenance
+### AI_RULES.md Maintenance
 
 - Keep this file under 200 lines
 - Use @path/to/file imports for detailed instructions
-- Use .claude/rules/ for path-specific rules
+- Use .ai/rules/ for path-specific rules
 - Review periodically: if AI does it correctly without a rule — remove the rule
 ```
 
 ---
 
-## Структура CLAUDE.md проекта
+## Структура AI_RULES.md проекта
 
 ```markdown
 # Project: [название]

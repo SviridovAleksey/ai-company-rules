@@ -3,14 +3,42 @@
 Файл `.mcp.json` размещается в корне каждого проекта.
 Конфигурация зависит от уровня проекта (см. раздел 2 стандарта).
 
+> **MCP (Model Context Protocol)** — открытый протокол для подключения ИИ-агентов к внешним инструментам и источникам данных. Конкретные MCP-серверы выбираются исходя из инструментов, принятых в компании. Примеры ниже — референсная конфигурация.
+
 **Принципы выбора MCP-серверов:**
 - Каждый сервер должен экономить контекстное окно, а не засорять его
-- Предпочитать MCP-серверы, которые возвращают точечные данные (context7, serena), а не сырые массивы (fetch)
+- Предпочитать MCP-серверы, которые возвращают точечные данные, а не сырые массивы
 - Не подключать серверы, дублирующие встроенные возможности модели
 
 ---
 
-## L1 — Public / Internal
+## Обязательные категории MCP-серверов
+
+Независимо от конкретных продуктов, каждый проект должен иметь MCP-серверы следующих категорий:
+
+| Категория | Назначение | L1 | L2 | L3 | Примеры реализаций |
+|-----------|-----------|----|----|----|--------------------|
+| **Память** | Персистентный контекст между сессиями | + | + | + | @modelcontextprotocol/server-memory |
+| **Документация библиотек** | Точечный доступ к документации без засорения контекста | + | + | -- | context7, devdocs |
+| **Git** | Структурированные git-операции (diff, log, branch) | + | + | + | mcp-server-git |
+| **Трекер задач** | Управление задачами, issue lifecycle | + | + | + | Atlassian MCP, Linear MCP, self-hosted |
+| **База знаний** | Синхронизация docs/ с корпоративной wiki | + | + | + | Atlassian MCP, Notion MCP, self-hosted |
+| **Навигация по коду** | Семантическая навигация (go to definition, find references) | + | + | + | serena, sourcegraph |
+
+> Для L3 все MCP-серверы должны быть развёрнуты внутри периметра компании. Облачные endpoint'ы запрещены.
+
+### Опциональные категории
+
+| Категория | Назначение | L1 | L2 | L3 | Примеры реализаций |
+|-----------|-----------|----|----|----|--------------------|
+| **HTTP-клиент** | Загрузка внешних ресурсов и API | + | + | -- | fetch |
+| **БД** | Доступ к базе данных через контролируемый интерфейс | -- | + | + | server-postgres, server-mysql |
+
+---
+
+## Референсные конфигурации
+
+### L1 — Public / Internal
 
 ```json
 {
@@ -27,11 +55,15 @@
       "command": "uvx",
       "args": ["mcp-server-git", "--repository", "."]
     },
-    "atlassian": {
+    "task-tracker": {
       "type": "url",
-      "url": "https://mcp.atlassian.com/v1/mcp"
+      "url": "${TASK_TRACKER_MCP_URL}"
     },
-    "serena": {
+    "knowledge-base": {
+      "type": "url",
+      "url": "${KNOWLEDGE_BASE_MCP_URL}"
+    },
+    "code-navigation": {
       "command": "uvx",
       "args": ["serena"]
     }
@@ -39,13 +71,13 @@
 }
 ```
 
-> **Atlassian MCP** покрывает и Jira, и Confluence через единый облачный endpoint. Аутентификация — OAuth 2.1 (браузерный consent flow) или API token (для CI/headless-сценариев, требует активации администратором организации).
+> Для Atlassian-стека: единый MCP endpoint `https://mcp.atlassian.com/v1/mcp` покрывает и трекер задач (Jira), и базу знаний (Confluence). Аутентификация — OAuth 2.1 или API token.
 
 ---
 
-## L2 — Confidential
+### L2 — Confidential
 
-Отличия от L1: добавлен `postgres` для работы с корпоративными данными через контролируемый интерфейс.
+Отличия от L1: добавлен MCP для работы с БД через контролируемый интерфейс.
 
 ```json
 {
@@ -62,15 +94,19 @@
       "command": "uvx",
       "args": ["mcp-server-git", "--repository", "."]
     },
-    "atlassian": {
+    "task-tracker": {
       "type": "url",
-      "url": "https://mcp.atlassian.com/v1/mcp"
+      "url": "${TASK_TRACKER_MCP_URL}"
     },
-    "serena": {
+    "knowledge-base": {
+      "type": "url",
+      "url": "${KNOWLEDGE_BASE_MCP_URL}"
+    },
+    "code-navigation": {
       "command": "uvx",
       "args": ["serena"]
     },
-    "postgres": {
+    "database": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-postgres"],
       "env": {
@@ -83,13 +119,12 @@
 
 ---
 
-## L3 — Restricted
+### L3 — Restricted
 
 Отличия от L2:
-- `context7` **отключён** — запрещены внешние сетевые запросы из ИИ-инструмента
-- `atlassian` **отключён** — облачный endpoint запрещён для L3
-- Вместо `atlassian` подключаются self-hosted MCP-серверы для Jira и Confluence
-- Все инструменты должны быть развёрнуты внутри периметра компании
+- **Документация библиотек** отключена — запрещены внешние сетевые запросы
+- Все MCP-серверы — **self-hosted** внутри периметра компании
+- Трекер задач и база знаний подключаются через внутренние endpoint'ы
 
 ```json
 {
@@ -102,28 +137,27 @@
       "command": "uvx",
       "args": ["mcp-server-git", "--repository", "."]
     },
-    "jira": {
+    "task-tracker": {
       "command": "npx",
-      "args": ["-y", "@anthropic/mcp-server-jira"],
+      "args": ["-y", "${TASK_TRACKER_MCP_PACKAGE}"],
       "env": {
-        "JIRA_BASE_URL": "${JIRA_INTERNAL_URL}",
-        "JIRA_API_TOKEN": "${JIRA_API_TOKEN}",
-        "JIRA_USER_EMAIL": "${JIRA_USER_EMAIL}"
+        "TRACKER_BASE_URL": "${TRACKER_INTERNAL_URL}",
+        "TRACKER_API_TOKEN": "${TRACKER_API_TOKEN}"
       }
     },
-    "confluence": {
+    "knowledge-base": {
       "command": "npx",
-      "args": ["-y", "mcp-confluence"],
+      "args": ["-y", "${KNOWLEDGE_BASE_MCP_PACKAGE}"],
       "env": {
-        "CONFLUENCE_BASE_URL": "${CONFLUENCE_INTERNAL_URL}",
-        "CONFLUENCE_TOKEN": "${CONFLUENCE_TOKEN}"
+        "KB_BASE_URL": "${KB_INTERNAL_URL}",
+        "KB_TOKEN": "${KB_TOKEN}"
       }
     },
-    "serena": {
+    "code-navigation": {
       "command": "uvx",
       "args": ["serena"]
     },
-    "postgres": {
+    "database": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-postgres"],
       "env": {
@@ -134,36 +168,15 @@
 }
 ```
 
-> **L3:** Конкретные MCP-серверы для self-hosted Jira и Confluence определяются отделом безопасности. Пакеты в примере выше — placeholder, заменить на утверждённые внутренние аналоги.
+> **L3:** Конкретные MCP-пакеты для self-hosted трекера и базы знаний определяются отделом безопасности. Пакеты в примере выше — placeholder.
 
 > Все переменные окружения (`${...}`) задаются через корпоративное хранилище секретов. Никаких значений в `.mcp.json` напрямую.
 
 ---
 
-## Сравнительная таблица
+## Не рекомендуемые MCP-серверы
 
-### Обязательные MCP-серверы
-
-| MCP-сервер | L1 | L2 | L3 | Назначение | Влияние на контекст |
-|------------|----|----|-----|-----------|-------------------|
-| memory | + | + | + | Персистентная память между сессиями | Минимальное — key-value хранилище |
-| context7 | + | + | — | Документация библиотек без засорения контекста | Экономит — точечные фрагменты вместо полной доки |
-| git | + | + | + | Структурированные git-операции (diff, log, branch) | Экономит — точечные данные вместо сырого вывода терминала |
-| atlassian | + | + | — | Jira + Confluence через единый облачный endpoint | Минимальное — структурированные запросы |
-| jira (self-hosted) | — | — | + | Issue Lifecycle для L3 (self-hosted Jira) | Минимальное |
-| confluence (self-hosted) | — | — | + | Синхронизация docs/ для L3 (self-hosted Confluence) | Минимальное |
-| serena | + | + | + | Семантическая навигация по коду (go to definition, find references) | Экономит — точечная навигация вместо чтения целых файлов |
-
-### Опциональные MCP-серверы
-
-| MCP-сервер | L1 | L2 | L3 | Назначение | Когда подключать |
-|------------|----|----|-----|-----------|-----------------|
-| fetch | + | + | — | Загрузка внешних ресурсов и API | Когда нужен доступ к внешним URL (документация, API specs) |
-| postgres | — | + | + | Доступ к БД через контролируемый интерфейс | Когда проект работает с PostgreSQL |
-
-### Удалённые MCP-серверы (не рекомендуются)
-
-| MCP-сервер | Причина удаления |
-|------------|-----------------|
-| sequential-thinking | Дублирует native extended thinking в Claude 4.x. Каждая «мысль» — это tool call с input/output, что тратит токены и засоряет контекст. Встроенное мышление модели эффективнее. |
-| time | Claude получает текущую дату/время из system prompt. MCP-сервер не даёт дополнительной ценности для задач разработки. |
+| MCP-сервер | Причина |
+|------------|---------|
+| sequential-thinking | Дублирует native extended thinking в современных LLM. Каждая «мысль» — tool call, что тратит токены и засоряет контекст. Встроенное мышление модели эффективнее. |
+| time | Современные LLM получают текущую дату/время из system prompt. MCP-сервер не даёт дополнительной ценности. |

@@ -1,6 +1,6 @@
 # Приложение G — CI/CD интеграция AI code review
 
-Автоматический AI code review в pipeline MR через non-interactive режим Claude Code CLI.
+Автоматический AI code review в pipeline MR через non-interactive режим CLI-агента ИИ.
 
 ---
 
@@ -9,6 +9,8 @@
 При создании MR в `dev` ветку CI/CD pipeline автоматически запускает AI code review. Результат — комментарий к MR с замечаниями. Разработчик получает замечания до ревью человека.
 
 **Writer/Reviewer паттерн:** AI review выполняется в свежей сессии — ИИ не предвзят к коду, который он же мог написать в другой сессии.
+
+> **Абстракция CLI:** в примерах ниже используется `ai-cli --prompt` как обобщённая команда. При реализации замените на конкретный инструмент: `claude -p` (Claude Code), `codex --prompt` (Codex) или аналог. Флаги (`--output-format`, `--allowed-tools`) адаптируйте под выбранный CLI.
 
 ---
 
@@ -23,7 +25,7 @@ ai-code-review:
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
   script:
     - |
-      claude -p "
+      ai-cli --prompt "
         You are a code reviewer. Review the diff for this MR.
 
         Run: git diff origin/dev...HEAD
@@ -64,7 +66,7 @@ jobs:
 
       - name: AI Code Review
         run: |
-          claude -p "
+          ai-cli --prompt "
             You are a code reviewer. Review the diff for this PR.
             Run: git diff origin/dev...HEAD
 
@@ -100,19 +102,19 @@ jobs:
 Для автоматического исправления замечаний ИИ добавить второй шаг:
 
 ```bash
-claude -p "
+ai-cli --prompt "
   Read review.json. Fix all WARN and FAIL items.
   Follow TDD: update tests first if needed.
   Run tests after fixing. Commit fixes as 'fix: address AI review feedback'.
-" --allowedTools "Read,Edit,Bash(git diff *),Bash(git commit *),Bash(${PROJECT_TEST_CMD:-npm test} *)"
+" --allowed-tools "Read,Edit,Bash(git diff *),Bash(git commit *),Bash(${PROJECT_TEST_CMD:-npm test} *)"
 ```
 
 > Замените `${PROJECT_TEST_CMD}` на команду запуска тестов для вашего стека.
 
 **Ограничения:**
-- `--allowedTools` ограничивает разрешённые операции
+- `--allowed-tools` ограничивает разрешённые операции
 - Автоисправление не заменяет ревью человека — финальное утверждение всегда за разработчиком
-- При L3 проектах — использовать self-hosted CLI
+- При L3 проектах — использовать self-hosted CLI-агент
 
 ---
 
