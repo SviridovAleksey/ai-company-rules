@@ -1,0 +1,3 @@
+[submodule "ai-company-rules-en"]
+	path = ai-company-rules-en
+	url = https://github.com/SviridovAleksey/ai-company-rules-en.git
