@@ -55,4 +55,5 @@ replay_pid*
 .worktrees/
 .security-key
 logs/security/
+output/
 
