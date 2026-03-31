@@ -48,7 +48,6 @@
 | Инструмент | DPA | Юрисдикция | Сертификация | Обучение на данных | Статус |
 |------------|-----|-----------|-------------|-------------------|--------|
 | ChatGPT (OpenAI) | TODO | TODO | TODO | TODO | Pending |
-| Claude (Anthropic) | TODO | TODO | TODO | TODO | Pending |
 | Cursor | TODO | TODO | TODO | TODO | Pending |
 | Claude Code | TODO | TODO | TODO | TODO | Pending |
 | Codex (OpenAI) | TODO | TODO | TODO | TODO | Pending |
